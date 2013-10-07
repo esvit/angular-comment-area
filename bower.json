@@ -1,0 +1,22 @@
+{
+  "name": "angular-comment-area",
+  "version": "0.1.0",
+  "main": [
+    "angular-comment-area.js",
+    "angular-comment-area.css"
+  ],
+  "ignore": [
+    "examples",
+    "src"
+  ],
+  "dependencies": {
+    "angular": ">=1.2.0-rc.2",
+    "jquery": ">=1.10.2",
+    "bootstrap": "~3.0.0",
+    "emojify.js": "https://github.com/hassankhan/emojify.js.git",
+    "angular-animate": "~1.2.0-rc.2"
+  },
+  "devDependencies": {
+    "angular-mocks": "1.2.0-rc.2"
+  }
+}

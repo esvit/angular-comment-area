@@ -1,0 +1,42 @@
+<div class="bz-comment-area-container form-control">
+
+    <div ng-show="$showSmiles" class="emoji-container">
+        <div ng-repeat="(name, smiles) in icons">
+            <div ng-if="name == 'people'">
+                <a href="" ng-repeat="smile in smiles" ng-click="insert(smile)"><img ng-class="smile" ng-src="{{ emptyGif }}" class="emojify" /></a>
+            </div>
+        </div>
+    </div>
+
+    <textarea></textarea>
+
+    <div title="Використовуйте TAB, щоб швидше відкривати смайли" class="emoji_smile emoji_smile_animation fl_l"
+         ng-click="showSmiles()" ng-class="{'emoji_smile_on': $showSmiles, 'emoji_smile_off': !$showSmiles}"
+         style="opacity: 0.7;">
+        <div class="emojify_on smiley"></div>
+        <div class="emojify smiley"></div>
+    </div>
+    <p class="drag-and-drop">
+    <span class="default">
+        Attach images by dragging &amp; dropping,
+        <input type="file" multiple="multiple" class="manual-file-chooser js-manual-file-chooser">
+        <a class="manual-file-chooser-text" href="#">selecting them</a>, or pasting
+        from the clipboard.
+    </span>
+    <span class="loading">
+      <img alt="Octocat-spinner-32" height="16" src="https://github.global.ssl.fastly.net/images/spinners/octocat-spinner-32.gif" width="16"> Uploading your images…
+    </span>
+    <span class="error bad-file">
+      Unfortunately we don't support that file type yet. Please use PNG, GIF, or JPG.
+    </span>
+    <span class="error too-big">
+      Yowza, that's a big file. Please submit an image file smaller than 5MB.
+    </span>
+    <span class="error bad-browser">
+      This browser doesn't support image attachments.
+    </span>
+    <span class="error failed-request">
+      Something went really wrong and we can't process that image.
+    </span>
+    </p>
+</div>
