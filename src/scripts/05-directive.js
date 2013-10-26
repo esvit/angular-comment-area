@@ -6,107 +6,59 @@ app.directive('bzCommentArea', ['bzCommentAreaIcons', function (icons) {
         TAGS_BLOCK = ['p', 'div', 'pre', 'form'],
         KEY_ESC = 27,
         KEY_TAB = 9;
+var emojis = [
+    "smile", "iphone", "girl", "smiley", "heart", "kiss", "copyright", "coffee",
+    "a", "ab", "airplane", "alien", "ambulance", "angel", "anger", "angry",
+    "arrow_forward", "arrow_left", "arrow_lower_left", "arrow_lower_right",
+    "arrow_right", "arrow_up", "arrow_upper_left", "arrow_upper_right",
+    "art", "astonished", "atm", "b", "baby", "baby_chick", "baby_symbol",
+    "balloon", "bamboo", "bank", "barber", "baseball", "basketball", "bath",
+    "bear", "beer", "beers", "beginner", "bell", "bento", "bike", "bikini",
+    "bird", "birthday", "black_square", "blue_car", "blue_heart", "blush",
+    "boar", "boat", "bomb", "book", "boot", "bouquet", "bow", "bowtie",
+    "boy", "bread", "briefcase", "broken_heart", "bug", "bulb",
+    "person_with_blond_hair", "phone", "pig", "pill", "pisces", "plus1",
+    "point_down", "point_left", "point_right", "point_up", "point_up_2",
+    "police_car", "poop", "post_office", "postbox", "pray", "princess",
+    "punch", "purple_heart", "question", "rabbit", "racehorse", "radio",
+    "up", "us", "v", "vhs", "vibration_mode", "virgo", "vs", "walking",
+    "warning", "watermelon", "wave", "wc", "wedding", "whale", "wheelchair",
+    "white_square", "wind_chime", "wink", "wink2", "wolf", "woman",
+    "womans_hat", "womens", "x", "yellow_heart", "zap", "zzz", "+1",
+    "-1"
+];
 
+var names = ["Jacob","Isabella","Ethan","Emma","Michael","Olivia","Alexander","Sophia","William","Ava","Joshua","Emily","Daniel","Madison","Jayden","Abigail","Noah","Chloe","дЅ еҐЅ","дЅ дЅ дЅ "];
+
+var names = $.map(names,function(value,i) {
+    return {'id':i,'name':value,'email':value+"@email.com"};
+});
+var emojis = $.map(emojis, function(value, i) {return {key: value, name:value}});
     var bzCommentArea = {
         restrict: 'C',
         scope: true,
         require: '?ngModel',
-        replace: true,
-        controller: bzCommentAreaController,
-        templateUrl: '/src/bz-comment-area/area.html',
+        replace: false,
         link: function(scope, element, attrs, ngModel) {
-            var editor, val;
-
-
-            scope.editor = editor = $('<div>').addClass('emoji-wysiwyg-editor')
-            //this.$editor.text($textarea.val());
-            .attr({contenteditable: 'true'})
-            .on('blur keyup change paste', function() {
-                    ngModel.$setViewValue(editor.html());
-                    if (!scope.$$phase) {
-                        scope.$apply();
-                    }
-                })
-            .on('mousedown focus', function() { document.execCommand('enableObjectResizing', false, false); })
-            .on('blur', function() { document.execCommand('enableObjectResizing', true, true); })
-            .on('keydown', function(e) {
-                if (e.keyCode === KEY_ESC) {
-                    scope.$showSmiles = false;
-                }
-                if (e.keyCode === KEY_TAB) {
-                    scope.showSmiles();
-                }
+            element.atwho({
+                at: ":",
+                data: emojis,
+                tpl:"<li data-value='${key}'>${name} <img src='http://a248.e.akamai.net/assets.github.com/images/icons/emoji/${name}.png'  height='20' width='20' /></li>",
+                insert_tpl: "<img src='http://a248.e.akamai.net/assets.github.com/images/icons/emoji/${name}.png'  height='20' width='20' />",
+                show_the_at: false
+            }).atwho({
+                at: "@",
+                data: names,
+                tpl: "<li data-value='@${name}'>${name}</li>"
             });
-
-            var escapeRegex = function(str) {
-                return (str + '').replace(/([.?*+^$[\]\\(){}|-])/g, '\\$1');
-            };
-
-            element.addClass('form-control').find('textarea').hide().after(editor);
-
-            ngModel.$render = function() {
-                editor.html(ngModel.$viewValue || '');
-            };
-
-            // set value, replace text by smiles
-            ngModel.$formatters.unshift(function (modelValue) {
-                for (var i = 0; i < icons.people.length; i++) {
-                    var key = icons.people[i];
-                    modelValue = modelValue.replace(new RegExp(escapeRegex(':' + key + ':'), 'g'), scope.createIcon(key));
-                }
-                return modelValue;
+            
+            element.on('change', function(val) {
+                $('img', element).each(function(n, i) {
+                console.info(i);
+                    $(i).on('resizestart', function(e) { return false });
+                });
             });
-
-            // replace html by text
-            ngModel.$parsers.unshift(function (viewValue) {
-                return val();
-            });
-
-            val = function() {
-                var lines = [];
-                var line  = [];
-
-                var flush = function() {
-                    lines.push(line.join(''));
-                    line = [];
-                };
-
-                var sanitizeNode = function(node) {
-                    if (node.nodeType === TEXT_NODE) {
-                        line.push(node.nodeValue);
-                    } else if (node.nodeType === ELEMENT_NODE) {
-                        var tagName = node.tagName.toLowerCase();
-                        var isBlock = TAGS_BLOCK.indexOf(tagName) !== -1;
-
-                        if (isBlock && line.length) flush();
-
-                        if (tagName === 'img') {
-                            var alt = node.getAttribute('alt') || '';
-                            if (alt) line.push(alt);
-                            return;
-                        } else if (tagName === 'br') {
-                            flush();
-                        }
-
-                        var children = node.childNodes;
-                        for (var i = 0; i < children.length; i++) {
-                            sanitizeNode(children[i]);
-                        }
-
-                        if (isBlock && line.length) flush();
-                    }
-                };
-
-                var children = editor[0].childNodes;
-                for (var i = 0; i < children.length; i++) {
-                    sanitizeNode(children[i]);
-                }
-
-                if (line.length) flush();
-
-                return lines.join('\n');
-            };
         }
     };
     return bzCommentArea;
-}]);
+}]);    
